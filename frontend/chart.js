@@ -1,6 +1,5 @@
 import { useD3, d3 } from './useD3';
-import React from 'react'; 
-import renderQueue from './renderQueue'; 
+import React from 'react';  
 
 // https://observablehq.com/@d3/brushable-parallel-coordinates
 
@@ -38,7 +37,7 @@ function Chart({ data, width, keys, blockHeight = 85 }) {
  
       const path = svg.append("g")
           .attr("fill", "none")
-          .attr("stroke-width", 1.5)
+          .attr("stroke-width", 2.0)
           .attr("stroke-opacity", 0.4)
           .selectAll("path")
           .data(data.slice().sort((a, b) => d3.ascending(a[keyz], b[keyz])))
@@ -72,8 +71,7 @@ function Chart({ data, width, keys, blockHeight = 85 }) {
       function brushed({selection}, key) {   
         // Issue getting selection here so parse the event manually
         var selection = d3.event.selection;   
-        var selected_key = keys[key];
- 
+        var selected_key = keys[key]; 
 
         if (selection === null) selections.delete(selected_key);
         else selections.set(selected_key, selection.map(x.get(selected_key).invert));
