@@ -12,8 +12,7 @@ import {
     Button,
     Box,
     Icon,
-} from '@airtable/blocks/ui';
-import {FieldType} from '@airtable/blocks/models';
+} from '@airtable/blocks/ui'; 
 import Chart from './chart';
 import { ParentSize } from '@visx/responsive'; 
 
@@ -28,8 +27,7 @@ export default function App() {
     const table = base.getTableByIdIfExists(tableId);
     const view = table ? table.getViewByIdIfExists(viewId) : null; 
  
-    const keys = [];
-
+    const keys = []; 
     for (let field of table.fields) { 
         if (field.type === 'number') { 
             keys.push(field.name);
@@ -38,16 +36,49 @@ export default function App() {
 
     const records = useRecords(view);
  
-    const data = records.map(record => {  
-        return keys.reduce((o, key) => ({ ...o, [key]: record.getCellValue(key)}), {}); 
+    const data = records.map(record => {   
+        return { id: record.id, ...keys.reduce((o, key) => ({ ...o, [key]: record.getCellValue(key)}), {}) }; 
     });
+  
+    const chunkArray = (array, chunkSize) => {
+        return Array.from(
+            { length: Math.ceil(array.length / chunkSize) },
+            (_, index) => array.slice(index * chunkSize, (index + 1) * chunkSize)   
+        );
+    }
+
+    const onFiltered = async (filteredRecords) => {
+            try {
+            
+                const toUpdate = [];
+
+                filteredRecords.forEach(element => {
+                    
+                    const record = records.find(record => record.id === element.id); 
+                    const permissionCheck = table.checkPermissionsForUpdateRecord(record, {
+                        "filtered": undefined,
+                    }); 
+
+                    if (!permissionCheck.hasPermission || !record) return;
+
+                    toUpdate.push({ id: record.id, fields: {'filtered': filteredRecords.length === records.length ? '' : '1'} });  
+                });
+ 
+                await Promise.all(chunkArray(toUpdate, 30).map(async (chunk) => { 
+                    await table.updateRecordsAsync(chunk); 
+                }));
+
+            } catch (error) { 
+                console.log(error);
+            }
+    }; 
 
     return (
         <div> 
             <ParentSize>
                 {parent => {
                     return ( 
-                        <Chart data={data} keys={keys} width={parent.width} /> 
+                        <Chart data={data} keys={keys} width={parent.width} onFiltered={onFiltered} /> 
                     )
                 }}
             </ParentSize>   

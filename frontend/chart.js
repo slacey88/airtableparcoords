@@ -3,7 +3,7 @@ import React from 'react';
 
 // https://observablehq.com/@d3/brushable-parallel-coordinates
 
-function Chart({ data, width, keys, blockHeight = 85 }) { 
+function Chart({ data, width, keys, blockHeight = 85, onFiltered }) { 
     
   const height = keys.length * blockHeight; 
   const margin = { top: 40, right: 20, bottom: 30, left: 20 }; 
@@ -33,7 +33,8 @@ function Chart({ data, width, keys, blockHeight = 85 }) {
           [margin.left, -(brushHeight)],
           [width - margin.right, brushHeight]
         ])
-        .on("start brush end", brushed);
+        .on("start brush end", brushed)
+     //   .on("end", brushedEnd);
  
       const path = svg.append("g")
           .attr("fill", "none")
@@ -66,7 +67,7 @@ function Chart({ data, width, keys, blockHeight = 85 }) {
               .attr("stroke", "white"))
             .call(brush);
       
-      const selections = new Map(); 
+      const selections = new Map();  
 
       function brushed({selection}, key) {   
         // Issue getting selection here so parse the event manually
@@ -86,6 +87,10 @@ function Chart({ data, width, keys, blockHeight = 85 }) {
             selected.push(d);
           }
         }); 
+ 
+        if (d3.event.type !== 'brush') {
+            onFiltered(selected); 
+        } 
       }
 
       svg.property("value", data).node();
