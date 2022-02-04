@@ -46,17 +46,18 @@ export default function App() {
                 }
           })  
             
+    const keys = ["economy (mpg)", "cylinders", "displacement (cc)", "power (hp)", "weight (lb)", "0-60 mph (s)", "year"]; 
+
     return (
-        <div>
-            <Box padding={3} >   
-                <ParentSize>
-                    {parent => {
-                        return ( 
-                            <Chart data={data} width={parent.width} /> 
-                        )
-                    }}
-                </ParentSize>  
-            </Box> 
+        <div> 
+            <ParentSize>
+                {parent => {
+                    return ( 
+                        <Chart data={data} keys={keys} width={parent.width} /> 
+                    )
+                }}
+            </ParentSize>   
+
             <Box padding={3} style={{visibility: 'hidden'}}>  
                 <FormField label="Table">
                     <TablePickerSynced globalConfigKey="selectedTableId" />
