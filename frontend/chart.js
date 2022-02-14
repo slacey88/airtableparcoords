@@ -33,8 +33,7 @@ function Chart({ data, width, keys, blockHeight = 85, onFiltered }) {
           [margin.left, -(brushHeight)],
           [width - margin.right, brushHeight]
         ])
-        .on("start brush end", brushed)
-     //   .on("end", brushedEnd);
+        .on("start brush end", brushed) 
  
       const path = svg.append("g")
           .attr("fill", "none")
@@ -88,7 +87,7 @@ function Chart({ data, width, keys, blockHeight = 85, onFiltered }) {
           }
         }); 
  
-        if (d3.event.type !== 'brush') {
+        if (d3.event.type !== 'brush' && selected.length > 0) {
             onFiltered(selected); 
         } 
       }
